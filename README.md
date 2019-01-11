@@ -8,4 +8,5 @@ The audio signal is made by a buzzer. The projects include a reflective vest whi
 * Buzzer  
 * Some resistors and wires  
 * Reflective Vest  
+* Glove
  

@@ -13,8 +13,8 @@
 #define X_MAX 156
 #define Y_MIN -10
 #define Y_MAX -9
-#define Z_MIN -2
-#define Z_MAX 2
+#define Z_MIN -3
+#define Z_MAX 3
 
 bool blinkState = false;
 

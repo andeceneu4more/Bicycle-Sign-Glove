@@ -10,7 +10,7 @@ void setup()
 {
   Serial.begin(115200);
   myMPU.initialization();
-  setupLights();
+  setupSignals();
 }
 int state = 0;
 void loop() 
@@ -22,62 +22,29 @@ void loop()
       case STRAIGHT_STATE:
           breakLeft();
           breakRight();
-          if (myMPU.gyrosY() > Y_MAX && myMPU.gyrosZ() < Z_MIN)
+          if (myMPU.gyrosY() > Y_MAX && myMPU.gyrosZ() < Z_MIN && myMPU.gyrosX() < X_MIN)
           {
               state = LEFT_STATE;
           }
           else
-            if (myMPU.gyrosY() > Y_MAX && myMPU.gyrosZ() > Z_MAX)
+            if (myMPU.gyrosY() > Y_MAX && myMPU.gyrosZ() > Z_MAX && myMPU.gyrosX() > X_MAX)
             {
                 state = RIGHT_STATE;
             }
           break;
       case LEFT_STATE:
           leftSignal();
-          if (Y_MIN <= myMPU.gyrosY() && myMPU.gyrosY() <= Y_MAX || Z_MIN <= myMPU.gyrosZ() && myMPU.gyrosZ() <= Z_MAX)
+          if (Y_MIN <= myMPU.gyrosY() && myMPU.gyrosY() <= Y_MAX || Z_MIN <= myMPU.gyrosZ() && myMPU.gyrosZ() <= Z_MAX || X_MIN <= myMPU.gyrosX() && myMPU.gyrosX() <= X_MAX)
           {
               state = STRAIGHT_STATE;
           }
           break;
       case RIGHT_STATE:
           rightSignal();
-          if (Y_MIN <= myMPU.gyrosY() && myMPU.gyrosY() <= Y_MAX || Z_MIN <= myMPU.gyrosZ() && myMPU.gyrosZ() <= Z_MAX)
+          if (Y_MIN <= myMPU.gyrosY() && myMPU.gyrosY() <= Y_MAX || Z_MIN <= myMPU.gyrosZ() && myMPU.gyrosZ() <= Z_MAX || X_MIN <= myMPU.gyrosX() && myMPU.gyrosX() <= X_MAX)
           {
               state = STRAIGHT_STATE;
           }
           break;
   }
 }
-/*
-switch(state)
-  {
-      case STRAIGHT_STATE:
-          breakLeft();
-          breakRight();
-          if (myMPU.gyrosX() < X_MIN && myMPU.gyrosZ() < Z_MIN)
-          {
-              state = LEFT_STATE;
-          }
-          else
-            if (myMPU.gyrosX() > X_MAX && myMPU.gyrosZ() > Z_MAX)
-            {
-                state = RIGHT_STATE;
-            }
-          break;
-      case LEFT_STATE:
-          leftSignal();
-          if (X_MIN <= myMPU.gyrosX() && myMPU.gyrosX() <= X_MAX || Z_MIN <= myMPU.gyrosZ() && myMPU.gyrosZ() <= Z_MAX)
-          {
-              state = STRAIGHT_STATE;
-          }
-          break;
-      case RIGHT_STATE:
-          rightSignal();
-          if (X_MIN <= myMPU.gyrosX() && myMPU.gyrosX() <= X_MAX || Z_MIN <= myMPU.gyrosZ() && myMPU.gyrosZ() <= Z_MAX)
-          {
-              state = STRAIGHT_STATE;
-          }
-          break;
-  }
- * /
- */

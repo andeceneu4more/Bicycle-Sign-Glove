@@ -1,8 +1,8 @@
 #ifndef SIGNALS_H
 #define SIGNALS_H
 
-#define LEFT_PIN 7
-#define RIGHT_PIN 4
+#define LEFT_PIN 4 
+#define RIGHT_PIN 7
 #define FLASH_RATE 200
 
 long long  lastLeftTime, lastRightTime; 

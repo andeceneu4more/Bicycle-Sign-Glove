@@ -1,5 +1,5 @@
-#ifndef MPU_GY_521_H
-#define MPU_GY_521_H
+#ifndef MPU_GY_521_V2_H
+#define MPU_GY_521_V2_H
 
 #include "I2Cdev.h"
 #include "MPU6050_6Axis_MotionApps20.h"
@@ -8,6 +8,13 @@
 
 #define INTERRUPT_PIN 2  // use pin 2 on Arduino Uno & most boards
 #define LED_PIN 13 // (Arduino is 13, Teensy is 11, Teensy++ is 6)
+
+#define X_MIN 112 
+#define X_MAX 156
+#define Y_MIN -10
+#define Y_MAX -9
+#define Z_MIN -2
+#define Z_MAX 2
 
 bool blinkState = false;
 
@@ -20,13 +27,14 @@ void dmpDataReady()
 class mpu521 : public MPU6050
 {
 private:
-	float gyrosMinX, gyrosMinY, gyrosMinZ;
-	float gyrosMaxX, gyrosMaxY, gyrosMaxZ;
-
-	float acceloMinX, acceloMinY, acceloMinZ;
-	float acceloMaxX, acceloMaxY, acceloMaxZ;
+  	float gyrosMinX, gyrosMinY, gyrosMinZ;
+  	float gyrosMaxX, gyrosMaxY, gyrosMaxZ;
+  
+  	float acceloMinX, acceloMinY, acceloMinZ;
+  	float acceloMaxX, acceloMaxY, acceloMaxZ;
     
     float _gyrosX, _gyrosY, _gyrosZ;
+    float _acceloX, _acceloY, _acceloZ;
     
     // MPU control/status vars
     bool dmpReady = false;  // set true if DMP init was successful
@@ -42,7 +50,8 @@ private:
     VectorInt16 aaReal;     // [x, y, z]            gravity-free accel sensor measurements
     VectorInt16 aaWorld;    // [x, y, z]            world-frame accel sensor measurements
     VectorFloat gravity;    // [x, y, z]            gravity vector
-	float euler[3];         // [psi, theta, phi]    Euler angle container
+	  float euler[3];         // [psi, theta, phi]    Euler angle container
+    float ypr[3];           // [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector
 
 public:
     void initialization();
@@ -137,26 +146,39 @@ void mpu521::recordValues()
         dmpGetLinearAccelInWorld(&aaWorld, &aaReal, &q);
 
         // update boundaries for accelerometer
-        if (acceloMinX > aaWorld.x)
-          acceloMinX = aaWorld.x;
-        if (acceloMaxX < aaWorld.x)
-          acceloMaxX = aaWorld.x;
- 
-        if (acceloMinY > aaWorld.y)
-          acceloMinY = aaWorld.y;
-        if (acceloMaxY < aaWorld.y)
-          acceloMaxY = aaWorld.y;
+        _acceloX = aaWorld.x;
+        _acceloY = aaWorld.y;
+        _acceloZ = aaWorld.z;
+    
+        if (acceloMinX > _acceloX)
+          acceloMinX = _acceloX;
+        if (acceloMaxX < _acceloX)
+          acceloMaxX = _acceloX;
+    
+        if (acceloMinY > _acceloY)
+          acceloMinY = _acceloY;
+        if (acceloMaxY < _acceloY)
+          acceloMaxY = _acceloY;
         
-        if (acceloMinZ > aaWorld.z)
-          acceloMinZ = aaWorld.z;
-        if (acceloMaxZ < aaWorld.z)
-          acceloMaxZ = aaWorld.z;
+        if (acceloMinZ > _acceloZ)
+          acceloMinZ = _acceloZ;
+        if (acceloMaxZ < _acceloZ)
+          acceloMaxZ = _acceloZ;
 
 
+        /*
         dmpGetEuler(euler, &q);
         _gyrosX = euler[0] * 180 / M_PI;
         _gyrosY = euler[1] * 180 / M_PI;
         _gyrosZ = euler[2] * 180 / M_PI;
+        */
+
+        dmpGetQuaternion(&q, fifoBuffer);
+        dmpGetGravity(&gravity, &q);
+        dmpGetYawPitchRoll(ypr, &q, &gravity);
+        _gyrosX = ypr[0] * 180.0 / M_PI;
+        _gyrosY = ypr[1] * 180.0 / M_PI;
+        _gyrosZ = ypr[2] * 180.0 / M_PI;
 
         if (gyrosMinX > _gyrosX)
           gyrosMinX = _gyrosX;
@@ -206,19 +228,19 @@ void mpu521::printValues()
     Serial.print(" Y = ");
     Serial.print(_gyrosY);
     Serial.print(" Z = ");
-    Serial.print(_gyrosZ);
+    Serial.println(_gyrosZ);
    
-    Serial.print(" Accel (g)");
+    /*Serial.print(" Accel (g)");
     Serial.print(" X = ");
     Serial.print(aaWorld.x);
     Serial.print(" Y = ");
     Serial.print(aaWorld.y);
     Serial.print(" Z = ");
-    Serial.println(aaWorld.z);
+    Serial.println(aaWorld.z);*/
 }
 void mpu521::printBoundaries()
 {
-	Serial.print("Gyro xmin = ");
+	  Serial.print("Gyro xmin = ");
     Serial.print(gyrosMinX);
     Serial.print(" xmax = ");
     Serial.print(gyrosMaxX);
@@ -231,7 +253,7 @@ void mpu521::printBoundaries()
     Serial.print(" zmax = ");
     Serial.println(gyrosMaxZ);
 
-    Serial.print("Accel xmin = ");
+    /*Serial.print("Accel xmin = ");
     Serial.print(acceloMinX);
     Serial.print(" xmax = ");
     Serial.print(acceloMaxX);
@@ -242,6 +264,6 @@ void mpu521::printBoundaries()
     Serial.print("\tzmin = ");
     Serial.print(acceloMinZ);
     Serial.print(" zmax = ");
-    Serial.println(acceloMaxZ);
+    Serial.println(acceloMaxZ);*/
 }
 #endif

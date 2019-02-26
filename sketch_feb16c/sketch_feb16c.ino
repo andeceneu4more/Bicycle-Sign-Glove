@@ -27,14 +27,14 @@ void loop()
       case STRAIGHT_STATE:
           breakLeft();
           breakRight();
-          if (myMPU.gyrosY() > Y_MAX && myMPU.gyrosZ() < Z_MIN)
+          if (myMPU.gyrosY() > Y_MAX &&  myMPU.gyrosZ() > Z_MAX)
           {
               state = LEFT_STATE;
               signalValue = true;
               lastSignal = false;
           }
           else
-            if (myMPU.gyrosY() > Y_MAX && myMPU.gyrosZ() > Z_MAX)
+            if (myMPU.gyrosY() > Y_MAX && myMPU.gyrosZ() < Z_MIN)
             {
                 state = RIGHT_STATE;
                 signalValue = true;

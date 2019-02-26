@@ -9,13 +9,10 @@
 #define INTERRUPT_PIN 2  // use pin 2 on Arduino Uno & most boards
 #define LED_PIN 13 // (Arduino is 13, Teensy is 11, Teensy++ is 6)
 
-#define X_MIN 112 
-#define X_MAX 156
 #define Y_MIN -10
 #define Y_MAX -9
-#define Z_MIN -3
-#define Z_MAX 3
-
+#define Z_MIN -2
+#define Z_MAX 2
 bool blinkState = false;
 
 volatile bool mpuInterrupt = false;     // indicates whether MPU interrupt pin has gone high
@@ -165,14 +162,6 @@ void mpu521::recordValues()
         if (acceloMaxZ < _acceloZ)
           acceloMaxZ = _acceloZ;
 
-
-        /*
-        dmpGetEuler(euler, &q);
-        _gyrosX = euler[0] * 180 / M_PI;
-        _gyrosY = euler[1] * 180 / M_PI;
-        _gyrosZ = euler[2] * 180 / M_PI;
-        */
-
         dmpGetQuaternion(&q, fifoBuffer);
         dmpGetGravity(&gravity, &q);
         dmpGetYawPitchRoll(ypr, &q, &gravity);
@@ -198,15 +187,15 @@ void mpu521::recordValues()
 }
 float mpu521::acceloX()
 {
-    return aaWorld.x;
+    return _acceloX;
 }
 float mpu521::acceloY()
 {
-    return aaWorld.y;
+    return _acceloY;
 }
 float mpu521::acceloZ()
 {
-    return aaWorld.z;
+    return _acceloZ;
 }
 float mpu521::gyrosX()
 {
@@ -229,14 +218,6 @@ void mpu521::printValues()
     Serial.print(_gyrosY);
     Serial.print(" Z = ");
     Serial.println(_gyrosZ);
-   
-    /*Serial.print(" Accel (g)");
-    Serial.print(" X = ");
-    Serial.print(aaWorld.x);
-    Serial.print(" Y = ");
-    Serial.print(aaWorld.y);
-    Serial.print(" Z = ");
-    Serial.println(aaWorld.z);*/
 }
 void mpu521::printBoundaries()
 {
@@ -252,18 +233,5 @@ void mpu521::printBoundaries()
     Serial.print(gyrosMinZ);
     Serial.print(" zmax = ");
     Serial.println(gyrosMaxZ);
-
-    /*Serial.print("Accel xmin = ");
-    Serial.print(acceloMinX);
-    Serial.print(" xmax = ");
-    Serial.print(acceloMaxX);
-    Serial.print("\tymin = ");
-    Serial.print(acceloMinY);
-    Serial.print(" ymax = ");
-    Serial.print(acceloMaxY);
-    Serial.print("\tzmin = ");
-    Serial.print(acceloMinZ);
-    Serial.print(" zmax = ");
-    Serial.println(acceloMaxZ);*/
 }
 #endif
